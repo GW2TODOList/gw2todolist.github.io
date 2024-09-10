@@ -1,0 +1,43 @@
+html {
+  width: 100% !important;
+}
+* {
+  box-sizing: border-box;
+  text-align: justify;
+}
+#body {
+  position: relative;
+}
+body section {
+  font-size: 1.15rem;
+}
+
+.no-style, .no-style:hover {
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.pt-6 {
+  padding-top: 6rem !important;
+}
+.pb-6 {
+  padding-bottom: 6rem !important;
+}
+
+#profile-pict {
+  border-radius: 50%;
+  max-width: 100%;
+}
+
+.scroller {
+  overflow: scroll;
+  max-height: 75vh;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+/* ======  MEDIA QUERY SECTION START ====== */
+
+/* <<<<<<  MEDIA QUERY SECTION END >>>>>> */
