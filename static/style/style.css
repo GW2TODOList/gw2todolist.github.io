@@ -24,18 +24,18 @@ body section {
   padding-bottom: 6rem !important;
 }
 
-#profile-pict {
-  border-radius: 50%;
-  max-width: 100%;
-}
-
 .scroller {
   overflow: scroll;
   max-height: 75vh;
 }
 
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+#alert-header {
+  position: sticky;
+  z-index: 10000;
 }
 
 /* ======  MEDIA QUERY SECTION START ====== */

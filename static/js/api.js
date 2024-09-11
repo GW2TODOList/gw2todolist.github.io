@@ -16,7 +16,7 @@ function verifyToken() {
     if (response_code != 200) {
         // Token error
         console.log(token_info);
-        return token_info.responseJSON.text;
+        return [false, "Bad token"];
     } else {
         // Token good, check permissions
         const needed_perm = [
@@ -25,10 +25,10 @@ function verifyToken() {
         let resp_perms = token_info.responseJSON.permissions;
         for (let perm of needed_perm) {
             if (!resp_perms.includes(perm)) {
-                return false, "Missing " + perm + " permission in API Token";
+                return [false, "Missing " + perm + " permission in API Token"];
             }
         }
-        return true
+        return [true, ""]
     }
 }
 

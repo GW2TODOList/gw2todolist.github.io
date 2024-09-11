@@ -11,9 +11,9 @@
     <link rel="icon" href="static/images/favicon.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GW2 TODO List</title>
-    <link rel="stylesheet" href="static/style/styles.css"/>
     <link rel="stylesheet" href="static/style/bootstrap/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="static/style/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/style/style.css"/>
     <script type="text/javascript" src="static/js/jquery-3.6.0.min.js" defer></script>
     <script type="text/javascript" src="static/js/api.js" defer></script>
     <script type="text/javascript" src="static/js/script.js" defer></script>
@@ -22,7 +22,8 @@
 
   <body>
   <!-- Login Modal -->
-  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal"
+      aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-body">
@@ -35,6 +36,45 @@
     </div>
   </div>
   <!-- Login Modal end -->
+  <header>
+    <nav class="navbar navbar-dark bg-dark sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="static/style/logo.svg" alt="GW2-TODO List logo" width="30" height="24">
+        </a>
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Export</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Load</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Add bulk</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Change API key</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <section>
+      <!-- Alert section -->
+      <div id="alert-header"></div>
+      <!-- Alert section end -->
+      <!-- Add item input bar section -->
+      <div id="add-item">
+          <p class="user-select-all"></p>
+      </div>
+      <!-- Add item input bar end -->
+      <!-- Show tracked items section -->
+      <!-- Show tracked items end -->
+  </section>
+  <footer>
+      <!-- github link -->
+      <!-- created by -->
+  </footer>
 
   </body>
 </html>
