@@ -1,4 +1,62 @@
-function isUserLogged() {
+/////////////////
+//     API     //
+/////////////////
+
+async function api_request(endpoint) {
+    let storage = window.localStorage;
+    return $.ajax({
+        url: "https://api.guildwars2.com/v2/" + endpoint + "?access_token=" + storage.getItem("token") + "&v=2024-07-20T01:00:00.000Z",
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) { return data; }
+    });
+}
+
+async function verifyToken() {
+    /**
+     * Verify token has the right permissions
+     **/
+    let token_info = await api_request("tokeninfo")
+    console.log(token_info)
+    console.log("checking token");
+    // Token good, check permissions
+    const needed_perm = [
+        "progression", "wallet", "account", "inventories", "unlocks"
+    ];
+    let resp_perms = token_info.permissions;
+    for (let perm of needed_perm) {
+        if (!resp_perms.includes(perm)) {
+            console.log("Bad, no ok");
+            return [false, "Missing " + perm + " permission in API Token"];
+        }
+    }
+    console.log("Token ok");
+
+    return [true, ""];
+    console.log(textStatus);
+    return [false, textStatus];
+}
+
+
+function login() {
+    /*
+     * Verify user token and save data in storage
+     **/
+    let storage = window.localStorage;
+    // Verify token
+    let [token_ok, _] = verifyToken();
+    if (token_ok) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/////////////////////////////////
+/////////////////////////////////
+
+
+function isUserLogged () {
     /*
      * Get and verify user token is exists
      **/
@@ -7,8 +65,8 @@ function isUserLogged() {
         console.log("user not logged");
         return false;
     }
-    token = storage.getItem("token");
-    if (!token || !verifyToken(token)[0]) {
+    let [is_ok, _] = verifyToken();
+    if (!is_ok) {
         console.log("bad token");
         return false;
     }
@@ -38,18 +96,20 @@ function _alertGenerator(text, color) {
     return html;
 }
 
-function submitUserToken() {
+async function submitUserToken () {
     /* Store user token in storage, and
      * verify it
     */
     let storage = window.localStorage;
     storage.setItem("token", $("#input_apikey")[0].value);
-    // api.js
-    let [is_ok, msg] = verifyToken();
+
+    let [is_ok, msg] = await verifyToken()
     if (is_ok) {
-        // Token ok, remove modal and load things
+        console.log("OK");
+        return true;
     } else {
-        // Bad token, show toast
+        // Bad token, show alert
+        console.log("bad token");
         storage.removeItem("token");
         let token_alert = _alertGenerator(msg, "danger");
         $("#alert-header").append(token_alert);
