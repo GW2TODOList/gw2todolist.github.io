@@ -52,7 +52,7 @@
             <a class="nav-link disabled" href="#">Add bulk</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#">Change API key</a>
+            <a id="resetToken" class="nav-link" href="#">Change API key</a>
           </li>
         </ul>
       </div>
@@ -62,14 +62,25 @@
       <!-- Alert section -->
       <div id="alert-header"></div>
       <!-- Alert section end -->
-      <!-- Add item input bar section -->
-      <div id="add-item">
-          <p class="user-select-all"></p>
+      <div class="container">
+        <!-- Add item input bar section -->
+        <div class="row justify-content-center pt-4 pb-4">
+          <div id="add-item" class="col-6">
+            <div class="input-group">
+              <span class="input-group-text" id="item-addon">Item</span>
+              <input id="item-input-id" type="text" class="form-control" placeholder="[&AgFGIQAA] or item's name" aria-label="Item id" aria-describedby="item-addon">
+            </div>
+          </div>
+        </div>
+        <!-- Add item input bar end -->
+        <!-- Show tracked items section -->
+        <div class="container-fluid">
+            <h2> TODO List </h2>
+            <p> placeholder </p>
+        </div>
+        <!-- Show tracked items end -->
       </div>
-      <!-- Add item input bar end -->
 
-      <!-- Show tracked items section -->
-      <!-- Show tracked items end -->
   </section>
   <footer>
       <!-- github link -->

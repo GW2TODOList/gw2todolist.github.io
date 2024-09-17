@@ -18,7 +18,6 @@ async function verifyToken() {
      **/
     let token_info = await api_request("tokeninfo")
     console.log(token_info)
-    console.log("checking token");
     // Token good, check permissions
     const needed_perm = [
         "progression", "wallet", "account", "inventories", "unlocks"
@@ -30,33 +29,14 @@ async function verifyToken() {
             return [false, "Missing " + perm + " permission in API Token"];
         }
     }
-    console.log("Token ok");
-
     return [true, ""];
-    console.log(textStatus);
-    return [false, textStatus];
-}
-
-
-function login() {
-    /*
-     * Verify user token and save data in storage
-     **/
-    let storage = window.localStorage;
-    // Verify token
-    let [token_ok, _] = verifyToken();
-    if (token_ok) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 /////////////////////////////////
 /////////////////////////////////
 
 
-function isUserLogged () {
+async function isUserLogged() {
     /*
      * Get and verify user token is exists
      **/
@@ -65,7 +45,7 @@ function isUserLogged () {
         console.log("user not logged");
         return false;
     }
-    let [is_ok, _] = verifyToken();
+    let [is_ok, _] = await verifyToken();
     if (!is_ok) {
         console.log("bad token");
         return false;
@@ -106,6 +86,7 @@ async function submitUserToken () {
     let [is_ok, msg] = await verifyToken()
     if (is_ok) {
         console.log("OK");
+        $("#loginModal").modal("toggle");
         return true;
     } else {
         // Bad token, show alert
@@ -114,6 +95,15 @@ async function submitUserToken () {
         let token_alert = _alertGenerator(msg, "danger");
         $("#alert-header").append(token_alert);
     }
+}
+
+function resetToken() {
+    /* User wants to change token
+    */
+    let storage = window.localStorage;
+    storage.removeItem("token");
+    $("#input_apikey").val("");
+    $("#loginModal").modal("show");
 }
 
 
@@ -136,13 +126,17 @@ function scrollToIt(section) {
 
 $(document).ready(function() {
     $("#loginModal button").on("click", submitUserToken);
+    $("#resetToken").on("click", resetToken);
+    $("#item-input-id").on("click", function(){ this.select(); });
 
     // Check if user has a session with valid token
-    let userLogged = isUserLogged();
-    if (!userLogged) {
-        $('#loginModal').modal('show');
-    } else {
-        getUserData();
-    }
+    isUserLogged().then(function(userLogged){
+        console.log(userLogged);
+        if (!userLogged) {
+            $('#loginModal').modal('show');
+        } else {
+            getUserData();
+        }
+    });
 });
 
