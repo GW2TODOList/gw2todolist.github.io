@@ -2,10 +2,10 @@
 //     API     //
 /////////////////
 
-async function api_request(endpoint) {
+async function api_request(endpoint, args="") {
     let storage = window.localStorage;
     return $.ajax({
-        url: "https://api.guildwars2.com/v2/" + endpoint + "?access_token=" + storage.getItem("token") + "&v=2024-07-20T01:00:00.000Z",
+        url: "https://api.guildwars2.com/v2/" + endpoint + "?access_token=" + storage.getItem("token") + "&v=2024-07-20T01:00:00.000Z" + args,
         method: 'GET',
         dataType: 'json',
         success: function(data) { return data; }
@@ -30,6 +30,23 @@ async function verifyToken() {
         }
     }
     return [true, ""];
+}
+
+function convertToId(chatLink) {
+    // Took from https://wiki.guildwars2.com/wiki/Talk:Chat_link_format
+    // Thank you very much. I simplified it to only return id
+    const clean_chatLink = chatLink.slice(2,-1);
+    const base64Decoded = atob(clean_chatLink).split("");
+    const hexCodes = base64Decoded.map(c => "0x" + c.charCodeAt(0).toString(16))
+    const bytes = hexCodes.map(h => parseInt(h, 16))
+    return bytes[2] << 0 | bytes[3] << 8 | bytes[4] << 16;
+}
+
+async function search() {
+    let storage = window.localStorage;
+    let item = $("#item-input-id").val().trim();
+    let lang = storage.getItem("lang") || "en";
+    return await api_request("items/"+convertToId(item), "&lang="+lang);
 }
 
 /////////////////////////////////
