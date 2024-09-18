@@ -68,15 +68,17 @@
           <div id="add-item" class="col-6">
             <div class="input-group">
               <span class="input-group-text" id="item-addon">Item</span>
-              <input id="item-input-id" type="text" class="form-control" placeholder="[&AgFGIQAA] or item's name" aria-label="Item id" aria-describedby="item-addon">
+              <input id="item-input-id" type="text" class="form-control" placeholder="As [&AgFGIQAA]" aria-label="Item id" aria-describedby="item-addon">
+              <button class="btn btn-outline-secondary" type="button" id="addItem-addon">Add</button>
             </div>
           </div>
         </div>
         <!-- Add item input bar end -->
         <!-- Show tracked items section -->
-        <div class="container-fluid">
-            <h2> TODO List </h2>
-            <p> placeholder </p>
+        <div id="todo-list" class="container-fluid">
+            <h3> TODO List </h3>
+            <div id="item-grid" class="row row-cols-2">
+            </div>
         </div>
         <!-- Show tracked items end -->
       </div>
