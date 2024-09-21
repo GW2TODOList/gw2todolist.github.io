@@ -46,10 +46,55 @@ function convertToId(chatLink) {
 }
 
 async function search() {
+    /* Search the item in the input box
+    */
     let storage = window.localStorage;
     let item = $("#item-input-id").val().trim();
     let lang = storage.getItem("lang") || "en";
     return await api_request("items/"+convertToId(item), "&lang="+lang);
+}
+
+async function getItemRecipe(item_id) {
+    /* Obtain possible recipes for an item
+    */
+    let storage = window.localStorage;
+    let lang = storage.getItem("lang") || "en";
+
+    let recipes = await api_request("recipes/search", "&output="+item_id);
+    let alternatives = [];
+    if (recipes.length > 0) {
+        let ingredients = [];
+        // For each possible recipe, store related items
+        for (let recp_id of recipes) {
+            let recp = await api_request("recipes/"+recp_id);
+            for (let ingr of recp['ingredients']) {
+                let recp_ingr = await api_request("items/"+ingr['id'], "&lang="+lang);
+                ingredients.push(recp_ingr);
+            }
+        }
+        alternatives.push(ingredients);
+    }
+    return alternatives;
+}
+
+async function updateUserInformation() {
+    /* Update user account materials and bank references
+    */
+    // TODO bank references
+    let storage = window.localStorage;
+    let mat_dict = {};
+    // Remap list of dicts into a dict by id
+    api_request("account/materials").then(
+        function(resp) {
+            resp.map((it) => (
+                mat_dict[it["id"]] = it["count"]
+            ))
+            // https://stackoverflow.com/a/13743332/9304067
+            storage.setItem("materials", JSON.stringify(mat_dict))
+            // TODO update materials indicator
+        }
+    );
+    console.log("User information updated");
 }
 
 /////////////////////////////////
@@ -83,6 +128,10 @@ async function isUserLogged() {
         console.log("bad token");
         return false;
     }
+
+    // Update stored data about materials
+    // and items
+    updateUserInformation()
     return true;
 }
 
@@ -114,33 +163,43 @@ function drawItem(item_json){
      * TODO Wiki link
     */
     console.log(item_json);
+    let _id = item_json['id'];
     let _url = item_json['icon'];
     let _name = item_json['name'];
-    let _rarity = item_json['rarity'];
+    let _rarity = item_json['rarity'].toLocaleLowerCase();
+    let _recipes = item_json['recipes'];
+
+    let recipes_html = "<div>";
+    for (let recipe of _recipes) {
+        recipes_html += "<div class='d-flex align-content-center'>";
+        for (let ingr of recipe) {
+            recipes_html += `<div class="d-flex ingredient">
+              <img src="`+ingr['icon']+`" alt="`+ingr['name']+` icon">
+            </div>`;
+        }
+        recipes_html += "</div>";
+    }
+    recipes_html += "</div>";
     // TODO check if item unlocked
+    // TODO Get account materials and process them to do this part
+    // A way to do this is check specific endpoints according to the
+    // item's type
     let html = `
-    <div class="row d-flex align-items-center mb-4">
+    <div id=`+_id+` class="row d-flex align-items-center mb-4">
       <!-- item image -->
-      <div class="col-auto">
-        <img src="`+_url+`" alt="`+_name+` icon">
+      <div class="col-auto main-item">
+        <img class=`+_rarity+` src="`+_url+`" alt="`+_name+` icon">
       </div>
       <!-- related info -->
       <div class="col-auto">
         <h4 class="col-12 align-self-start">
           `+_name+`
         </h4>
-        <div class="row">
-          <div class="col-auto">
-            Thing 1
-          </div>
-          <div class="col-auto">
-            Thing 2
-          </div>
+        `+recipes_html+`
         </div>
       </div>
-    </div>`
+    </div>`;
     $("#item-grid").append(html);
-
 }
 
 function addItem() {
@@ -148,23 +207,25 @@ function addItem() {
      * and paint it in the todo-list
      */
     let storage = window.localStorage;
-    let registered_items = storage.getItem("items");
+    let registered_items = JSON.parse(storage.getItem("items"));
     let input_val = $("#item-input-id").val();
     let item_id = convertToId(input_val);
 
     if (!registered_items)
-        registered_items = []
-    else
-        registered_items = registered_items.split(",").map((x) => parseInt(x));
+        registered_items = [];
 
-    if (registered_items && registered_items.includes(item_id)) {
-        console.log("alert");
+    if (registered_items && registered_items.map(it => (it['id'] == item_id)).includes(true)) {
         _alertGenerator("Item already in TODO List", "warning");
     } else {
         search().then(function(resp){
-            registered_items.push(item_id);
-            storage.setItem("items", registered_items);
-            drawItem(resp);
+            // Search and store related recipes
+            getItemRecipe(resp['id']).then(function(recipes){
+                resp['recipes'] = recipes;
+                registered_items.push(resp);
+                storage.setItem("items", JSON.stringify(registered_items));
+
+                drawItem(resp);
+            })
         });
     }
 
@@ -176,10 +237,12 @@ function getUserData() {
      *
      **/
     let storage = window.localStorage;
-    // TODO Draw user items
+    let items = JSON.parse(storage.getItem("items"));
+
+    for (let item of items) {
+        drawItem(item);
+    }
 }
-
-
 
 
 /// NAVBAR FUNCTIONS

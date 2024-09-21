@@ -1,3 +1,15 @@
+:root {
+    /* Copied from the wiki */
+    --junk: #AAAAAA;
+    --basic: black;
+    --fine: #62A4DA;
+    --masterwork: #1a9306;
+    --rare: #fcd00b;
+    --exotic: #ffa405;
+    --ascended: #fb3e8d;
+    --legendary: #4C139D;
+}
+
 html {
   width: 100% !important;
 }
@@ -37,6 +49,25 @@ body section {
   position: sticky;
   z-index: 10000;
 }
+
+#item-grid {
+    .main-item img {
+        border: 5px solid;
+        &.junk { border-color: var(--junk); }
+        &.basic { border-color: var(--basic); }
+        &.fine { border-color: var(--fine); }
+        &.masterwork { border-color: var(--masterwork); }
+        &.rare { border-color: var(--rare); }
+        &.exotic { border-color: var(--exotic); }
+        &.ascended { border-color: var(--ascended); }
+        &.legendary { border-color: var(--legendary); }
+    }
+    .ingredient {
+        & img { height: 75%; }
+    }
+}
+
+
 
 /* ======  MEDIA QUERY SECTION START ====== */
 
