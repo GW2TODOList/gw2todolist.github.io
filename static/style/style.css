@@ -51,6 +51,17 @@ body section {
 }
 
 #item-grid {
+    .todo-item {
+        position: relative;
+        .todo-delete {
+            position: absolute;
+            right: 20px;
+            top: 5px;
+            width: auto;
+            cursor: pointer;
+        }
+    }
+
     .main-item img {
         border: 5px solid;
         &.junk { border-color: var(--junk); }
@@ -63,7 +74,17 @@ body section {
         &.legendary { border-color: var(--legendary); }
     }
     .ingredient {
-        & img { height: 75%; }
+        position: relative;
+        max-height: 48px;  /* icons are 64x64px*/
+        max-width: 48px;
+        .item-count {
+            right: 0;
+            color: white;
+            background: #00000082;
+            position: absolute;
+            bottom: 0;
+            margin: 0;
+        }
     }
 }
 

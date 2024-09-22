@@ -9,4 +9,5 @@ is stored outside your PC
 
 - Token: Your API Token
 - Language: Language to retrieve information from the API. Default: English
-- SchemaVersion: For the API. You cannot change it.
+- Account materials: Materials in your account to avoid asking the API all the time
+- Items: List of items that you have included in the TODO List

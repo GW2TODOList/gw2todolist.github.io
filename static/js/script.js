@@ -69,6 +69,7 @@ async function getItemRecipe(item_id) {
             let recp = await api_request("recipes/"+recp_id);
             for (let ingr of recp['ingredients']) {
                 let recp_ingr = await api_request("items/"+ingr['id'], "&lang="+lang);
+                recp_ingr['count'] = ingr['count'];  // Add this info
                 ingredients.push(recp_ingr);
             }
         }
@@ -131,7 +132,7 @@ async function isUserLogged() {
 
     // Update stored data about materials
     // and items
-    updateUserInformation()
+    // updateUserInformation()
     return true;
 }
 
@@ -173,8 +174,14 @@ function drawItem(item_json){
     for (let recipe of _recipes) {
         recipes_html += "<div class='d-flex align-content-center'>";
         for (let ingr of recipe) {
-            recipes_html += `<div class="d-flex ingredient">
-              <img src="`+ingr['icon']+`" alt="`+ingr['name']+` icon">
+            let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(ingr['chat_link'])+"&go=Go&ns0=1";
+            let tooltip_title = ingr['name']+ " <a href='"+wiki_link+"' target='_blank'><i class='fa fa-wikipedia-w'></i></a>";
+            recipes_html += `<div class="d-flex ingredient pointer me-4">
+              <p class="item-count">x`+ingr['count']+`</p>
+              <img src="`+ingr['icon']+`" alt="`+ingr['name']+` icon"
+                data-bs-toggle="tooltip" data-bs-html="true"
+                data-bs-trigger="click"
+                title="`+tooltip_title+`">
             </div>`;
         }
         recipes_html += "</div>";
@@ -184,8 +191,9 @@ function drawItem(item_json){
     // TODO Get account materials and process them to do this part
     // A way to do this is check specific endpoints according to the
     // item's type
+    let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(item_json['chat_link'])+"&go=Go&ns0=1";
     let html = `
-    <div id=`+_id+` class="row d-flex align-items-center mb-4">
+    <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4">
       <!-- item image -->
       <div class="col-auto main-item">
         <img class=`+_rarity+` src="`+_url+`" alt="`+_name+` icon">
@@ -193,13 +201,23 @@ function drawItem(item_json){
       <!-- related info -->
       <div class="col-auto">
         <h4 class="col-12 align-self-start">
-          `+_name+`
+          `+_name+` <a href="`+wiki_link+`" target="_blank"><i class="fa fa-wikipedia-w"></i></a>
         </h4>
         `+recipes_html+`
-        </div>
       </div>
+      <i id="delete-`+_id+`" class="todo-delete fa fa-trash" itemId="`+_id+`"></i>
     </div>`;
     $("#item-grid").append(html);
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    $("#"+_id+" .ingredient").on('show.bs.tooltip', function() {
+        // Only one tooltip should ever be open at a time
+        $('.tooltip').not(this).tooltip('hide');
+    });
+    $("#delete-"+_id).on("click", removeItem);
+
 }
 
 function addItem() {
@@ -228,7 +246,14 @@ function addItem() {
             })
         });
     }
+}
 
+function removeItem() {
+    let item_id = $(this).attr("itemid");
+    $("#"+item_id).remove();
+    let items = JSON.parse(localStorage.items);
+    items = items.filter( (it) => (it['id'] != item_id) );
+    localStorage.setItem("items", JSON.stringify(items));
 }
 
 function getUserData() {
@@ -238,9 +263,10 @@ function getUserData() {
      **/
     let storage = window.localStorage;
     let items = JSON.parse(storage.getItem("items"));
-
-    for (let item of items) {
-        drawItem(item);
+    if (items)  {
+        for (let item of items) {
+            drawItem(item);
+        }
     }
 }
 
