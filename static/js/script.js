@@ -156,7 +156,26 @@ async function submitUserToken() {
     }
 }
 
-function drawItem(item_json){
+function checkUnlocked(item_json, count) {
+    /* Check availability in inventory, etc
+     * according to the item type
+     * return true if user has enough items, false otherwise
+    */
+    let type = item_json['type'];
+    let item_id = item_json['id'];
+
+    if (type == "CraftingMaterial") {
+        let materials = JSON.parse(localStorage.getItem("materials"));
+        console.log("enough mats", materials[item_id] >= count);
+        return materials[item_id] >= count;
+    } else {
+        console.log("Unsupport type");
+        return false;
+    }
+
+}
+
+function drawItem(item_json) {
     /* Paint the item in the todo-list according to user's
      * api key.
      * A bit transparent if not unlocked, no transparency if unlocked
@@ -174,6 +193,7 @@ function drawItem(item_json){
     for (let recipe of _recipes) {
         recipes_html += "<div class='d-flex align-content-center'>";
         for (let ingr of recipe) {
+            let unlocked = checkUnlocked(ingr, ingr['count']);
             let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(ingr['chat_link'])+"&go=Go&ns0=1";
             let tooltip_title = ingr['name']+ " <a href='"+wiki_link+"' target='_blank'><i class='fa fa-wikipedia-w'></i></a>";
             recipes_html += `<div class="d-flex ingredient pointer me-4">

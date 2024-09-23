@@ -1,5 +1,7 @@
 # :notebook::pencil2: GW2 TODO List
 
+Archived in favor of [https://github.com/GW2TODOList/gw2todolist.github.io](https://github.com/GW2TODOList/gw2todolist.github.io)
+
 ## This is a WIP, but usable
 
 Web interface to track progress on items
@@ -23,3 +25,4 @@ is stored outside your PC
 - Progress bar on the different items?
 - Possibility to reorder items in the list?
 - Nice CSS (PR are welcome :grin:)
+- How do I get Mystic forge recipes ??
