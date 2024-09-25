@@ -233,9 +233,9 @@ function drawItem(item_json) {
         extra_classes += " not-yet ";
     }
     let html = `
-    <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4`+extra_classes+`">
+    <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4">
       <!-- item image -->
-      <div class="col-auto main-item">
+      <div class="col-auto main-item`+extra_classes+`">
         <img class=`+_rarity+` src="`+_url+`" alt="`+_name+` icon">
       </div>
       <!-- related info -->
