@@ -78,23 +78,33 @@ async function getItemRecipe(item_id) {
     return alternatives;
 }
 
-async function updateUserInformation() {
-    /* Update user account materials and bank references
-    */
-    // TODO bank references
-    let storage = window.localStorage;
+async function refreshMaterials() {
+    /* Update user material information and visual icons
+     * */
+    $("#materials-flag i").removeClass("fa-check");
+    $("#materials-flag i").addClass("fa-refresh fa-spin");
+
     let mat_dict = {};
-    // Remap list of dicts into a dict by id
     api_request("account/materials").then(
         function(resp) {
+            // Remap list of dicts into a dict by id
             resp.map((it) => (
                 mat_dict[it["id"]] = it["count"]
             ))
             // https://stackoverflow.com/a/13743332/9304067
-            storage.setItem("materials", JSON.stringify(mat_dict))
+            localStorage.setItem("materials", JSON.stringify(mat_dict))
             // TODO update materials indicator
+            $("#materials-flag i").removeClass("fa-refresh fa-spin");
+            $("#materials-flag i").addClass("fa-check");
         }
     );
+}
+
+async function updateUserInformation() {
+    /* Update user account materials and bank references
+    */
+    await refreshMaterials();
+    // TODO bank references
     console.log("User information updated");
 }
 
@@ -132,7 +142,6 @@ async function isUserLogged() {
 
     // Update stored data about materials
     // and items
-    // updateUserInformation()
     return true;
 }
 
@@ -146,6 +155,7 @@ async function submitUserToken() {
     let [is_ok, msg] = await verifyToken()
     if (is_ok) {
         console.log("OK");
+        await updateUserInformation();
         $("#loginModal").modal("toggle");
         return true;
     } else {
@@ -188,15 +198,21 @@ function drawItem(item_json) {
     let _name = item_json['name'];
     let _rarity = item_json['rarity'].toLocaleLowerCase();
     let _recipes = item_json['recipes'];
+    let todo_unlocked = checkUnlocked(item_json, 1);
+
 
     let recipes_html = "<div>";
     for (let recipe of _recipes) {
         recipes_html += "<div class='d-flex align-content-center'>";
         for (let ingr of recipe) {
+            let extra_classes = "";
             let unlocked = checkUnlocked(ingr, ingr['count']);
+            if (!unlocked) {
+                extra_classes += " not-yet ";
+            }
             let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(ingr['chat_link'])+"&go=Go&ns0=1";
             let tooltip_title = ingr['name']+ " <a href='"+wiki_link+"' target='_blank'><i class='fa fa-wikipedia-w'></i></a>";
-            recipes_html += `<div class="d-flex ingredient pointer me-4">
+            recipes_html += `<div class="d-flex ingredient pointer me-4`+extra_classes+`">
               <p class="item-count">x`+ingr['count']+`</p>
               <img src="`+ingr['icon']+`" alt="`+ingr['name']+` icon"
                 data-bs-toggle="tooltip" data-bs-html="true"
@@ -212,8 +228,12 @@ function drawItem(item_json) {
     // A way to do this is check specific endpoints according to the
     // item's type
     let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(item_json['chat_link'])+"&go=Go&ns0=1";
+    let extra_classes = "";
+    if (!todo_unlocked) {
+        extra_classes += " not-yet ";
+    }
     let html = `
-    <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4">
+    <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4`+extra_classes+`">
       <!-- item image -->
       <div class="col-auto main-item">
         <img class=`+_rarity+` src="`+_url+`" alt="`+_name+` icon">
@@ -295,8 +315,7 @@ function getUserData() {
 function resetToken() {
     /* User wants to change token
     */
-    let storage = window.localStorage;
-    storage.removeItem("token");
+    localStorage.clear();
     $("#input_apikey").val("");
     $("#loginModal").modal("show");
 }
@@ -322,13 +341,18 @@ function scrollToIt(section) {
 
 $(document).ready(function() {
     $("#loginModal button").on("click", submitUserToken);
+    // Header
     $("#resetToken").on("click", resetToken);
+    /////
+    // Add item row
     $("#item-input-id").on("click", function(){ this.select(); });
+    $("#refresh-materials").on("click", refreshMaterials);
     $("#addItem-addon").on("click", addItem);
     $("#item-input-id").on("keydown", function(e){
         console.log("keydown");
         if (e.keyCode == 13) { console.log("enter"); addItem(); }
     });
+    //////
 
     // Check if user has a session with valid token
     isUserLogged().then(function(userLogged){

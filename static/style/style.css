@@ -50,6 +50,12 @@ body section {
   z-index: 10000;
 }
 
+#refresh-buttons {
+    .fa-check {
+        color: green;
+    }
+}
+
 #item-grid {
     .todo-item {
         position: relative;
@@ -60,6 +66,10 @@ body section {
             width: auto;
             cursor: pointer;
         }
+    }
+
+    .not-yet {
+        opacity: 60%;
     }
 
     .main-item img {

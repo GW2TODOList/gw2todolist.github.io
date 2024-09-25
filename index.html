@@ -65,13 +65,21 @@
       <!-- Alert section end -->
       <div class="container">
         <!-- Add item input bar section -->
-        <div class="row justify-content-center pt-4 pb-4">
+        <div class="row justify-content-between pt-4 pb-4">
           <div id="add-item" class="col-6">
             <div class="input-group">
               <span class="input-group-text" id="item-addon">Item</span>
               <input id="item-input-id" type="text" class="form-control" placeholder="As [&AgFGIQAA]" aria-label="Item id" aria-describedby="item-addon">
               <button class="btn btn-outline-secondary" type="button" id="addItem-addon">Add</button>
             </div>
+          </div>
+          <div id="refresh-buttons" class="col-auto">
+            <ul class="list-group border-none" style="border: none;">
+              <li class="border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
+                <small id="refresh-materials" class="pointer">Update materials</small>
+                <span id="materials-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
+              </li>
+            </ul>
           </div>
         </div>
         <!-- Add item input bar end -->
