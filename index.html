@@ -39,6 +39,23 @@
     </div>
   </div>
   <!-- Login Modal end -->
+  <!-- Refresh token modal -->
+  <div class="modal fade" id="tokenModal" tabindex="-1" role="dialog" aria-labelledby="tokenModal"
+      aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          API token and stored data will be removed
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abort</button>
+          <button id="confirmResetToken" type="button" class="btn btn-primary">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh token end -->
   <header>
     <nav class="navbar navbar-dark bg-dark sticky-top">
       <div class="container">
@@ -56,7 +73,7 @@
             <a class="nav-link disabled" href="#">Add bulk</a>
           </li>
           <li class="nav-item">
-            <a id="resetToken" class="nav-link" href="#">Change API key</a>
+            <a id="resetToken" class="nav-link" href="#">Reset API key</a>
           </li>
         </ul>
       </div>

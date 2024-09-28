@@ -45,13 +45,12 @@ function convertToId(chatLink) {
     return bytes[2] << 0 | bytes[3] << 8 | bytes[4] << 16;
 }
 
-async function search() {
+async function search(chat_link) {
     /* Search the item in the input box
     */
     let storage = window.localStorage;
-    let item = $("#item-input-id").val().trim();
     let lang = storage.getItem("lang") || "en";
-    return await api_request("items/"+convertToId(item), "&lang="+lang);
+    return await api_request("items/"+convertToId(chat_link), "&lang="+lang);
 }
 
 async function getItemRecipe(item_id) {
@@ -189,8 +188,6 @@ function drawItem(item_json) {
     /* Paint the item in the todo-list according to user's
      * api key.
      * A bit transparent if not unlocked, no transparency if unlocked
-     * TODO Also draw related items if it can be crafted
-     * TODO Wiki link
     */
     console.log(item_json);
     let _id = item_json['id'];
@@ -200,7 +197,7 @@ function drawItem(item_json) {
     let _recipes = item_json['recipes'];
     let todo_unlocked = checkUnlocked(item_json, 1);
 
-
+    // Generate ingredients html
     let recipes_html = "<div>";
     for (let recipe of _recipes) {
         recipes_html += "<div class='d-flex align-content-center'>";
@@ -211,7 +208,8 @@ function drawItem(item_json) {
                 extra_classes += " not-yet ";
             }
             let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(ingr['chat_link'])+"&go=Go&ns0=1";
-            let tooltip_title = ingr['name']+ " <a href='"+wiki_link+"' target='_blank'><i class='fa fa-wikipedia-w'></i></a>";
+            let tooltip_title = ingr['name']+ "<br><a href='"+wiki_link+"' target='_blank'>" +
+                "<i class='fa fa-wikipedia-w'></i></a><i id='add-"+ingr['chat_link']+"' class='add-item-icon fa fa-plus ms-4 pointer'></i>";
             recipes_html += `<div class="d-flex ingredient pointer me-4`+extra_classes+`">
               <p class="item-count">x`+ingr['count']+`</p>
               <img src="`+ingr['icon']+`" alt="`+ingr['name']+` icon"
@@ -223,15 +221,13 @@ function drawItem(item_json) {
         recipes_html += "</div>";
     }
     recipes_html += "</div>";
-    // TODO check if item unlocked
-    // TODO Get account materials and process them to do this part
-    // A way to do this is check specific endpoints according to the
-    // item's type
+
     let wiki_link = "https://wiki.guildwars2.com/index.php?search="+encodeURIComponent(item_json['chat_link'])+"&go=Go&ns0=1";
     let extra_classes = "";
     if (!todo_unlocked) {
         extra_classes += " not-yet ";
     }
+    // Final html
     let html = `
     <div id=`+_id+` class="todo-item row d-flex align-items-center mb-4">
       <!-- item image -->
@@ -248,26 +244,44 @@ function drawItem(item_json) {
       <i id="delete-`+_id+`" class="todo-delete fa fa-trash" itemId="`+_id+`"></i>
     </div>`;
     $("#item-grid").append(html);
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Tool tips things
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle='tooltip']:not([data-bs-original-title])"));
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        $(tooltipTriggerEl).off('inserted.bs.tooltip');
+        $(tooltipTriggerEl).one('inserted.bs.tooltip', function() {
+            $(".add-item-icon").last().on("click", function(){
+                let chat_link = $(this).attr("id").split("-")[1];
+                console.log("add ingr", chat_link);
+                addItem(chat_link);
+            });
+        });
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
     $("#"+_id+" .ingredient").on('show.bs.tooltip', function() {
         // Only one tooltip should ever be open at a time
         $('.tooltip').not(this).tooltip('hide');
     });
+    // Delete icon
     $("#delete-"+_id).on("click", removeItem);
 
 }
 
-function addItem() {
+function addItem(chat_link=undefined) {
     /* Read item chat link from the input text, add it to localStorage
      * and paint it in the todo-list
      */
+    console.log(chat_link);
     let storage = window.localStorage;
     let registered_items = JSON.parse(storage.getItem("items"));
-    let input_val = $("#item-input-id").val();
-    let item_id = convertToId(input_val);
+    let input_val = undefined;
+    let item_id = undefined;
+    if (chat_link != undefined) {
+        input_val = chat_link.trim();
+        item_id = convertToId(input_val);
+    }else {
+        input_val = $("#item-input-id").val().trim();
+        item_id = convertToId(input_val);
+    }
 
     if (!registered_items)
         registered_items = [];
@@ -275,7 +289,7 @@ function addItem() {
     if (registered_items && registered_items.map(it => (it['id'] == item_id)).includes(true)) {
         _alertGenerator("Item already in TODO List", "warning");
     } else {
-        search().then(function(resp){
+        search(input_val).then(function(resp){
             // Search and store related recipes
             getItemRecipe(resp['id']).then(function(recipes){
                 resp['recipes'] = recipes;
@@ -312,9 +326,13 @@ function getUserData() {
 
 
 /// NAVBAR FUNCTIONS
+function resetTokenModal() {
+    $("#tokenModal").modal("show");
+}
 function resetToken() {
     /* User wants to change token
     */
+    $("#tokenModal").modal("toggle");
     localStorage.clear();
     $("#input_apikey").val("");
     $("#loginModal").modal("show");
@@ -342,12 +360,13 @@ function scrollToIt(section) {
 $(document).ready(function() {
     $("#loginModal button").on("click", submitUserToken);
     // Header
-    $("#resetToken").on("click", resetToken);
+    $("#resetToken").on("click", resetTokenModal);
+    $("#confirmResetToken").on("click", resetToken);
     /////
     // Add item row
     $("#item-input-id").on("click", function(){ this.select(); });
     $("#refresh-materials").on("click", refreshMaterials);
-    $("#addItem-addon").on("click", addItem);
+    $("#addItem-addon").on("click", function() {addItem()});
     $("#item-input-id").on("keydown", function(e){
         console.log("keydown");
         if (e.keyCode == 13) { console.log("enter"); addItem(); }
