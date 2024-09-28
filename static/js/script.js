@@ -17,10 +17,10 @@ async function verifyToken() {
      * Verify token has the right permissions
      **/
     let token_info = await api_request("tokeninfo")
-    console.log(token_info)
+    // console.log(token_info)
     // Token good, check permissions
     const needed_perm = [
-        "progression", "wallet", "account", "inventories", "unlocks"
+        "account", "inventories", "characters", "unlocks", "builds"
     ];
     let resp_perms = token_info.permissions;
     for (let perm of needed_perm) {
@@ -82,7 +82,6 @@ async function refreshMaterials() {
      * */
     $("#materials-flag i").removeClass("fa-check");
     $("#materials-flag i").addClass("fa-refresh fa-spin");
-
     let mat_dict = {};
     api_request("account/materials").then(
         function(resp) {
@@ -92,17 +91,89 @@ async function refreshMaterials() {
             ))
             // https://stackoverflow.com/a/13743332/9304067
             localStorage.setItem("materials", JSON.stringify(mat_dict))
-            // TODO update materials indicator
             $("#materials-flag i").removeClass("fa-refresh fa-spin");
             $("#materials-flag i").addClass("fa-check");
         }
     );
 }
 
+async function refreshInventory() {
+    /* Refresh information about legendary armory
+     * and characters bags
+     * */
+    $("#inventory-flag i").removeClass("fa-check");
+    $("#inventory-flag i").addClass("fa-refresh fa-spin");
+
+    // Different dicts for async requests
+    let la_dict = {};
+    let equip_dict = {};
+    let inv_dict = {};
+
+    api_request("account/legendaryarmory").then(
+        function(resp) {
+            // Remap list of dicts into a dict by id
+            resp.map((it) => (
+                la_dict[it["id"]] = it["count"]
+            ))
+        }
+    );
+    api_request("characters").then(async function(chars) {
+        let queries = [];
+        for (let id in chars) {
+            // Iter characters to get their inventory and equipment
+            // Iter equipment
+            let _q = api_request("characters/"+encodeURIComponent(chars[id])+"/equipment").then(
+                function(equip) {
+                    equip["equipment"].map(function(item) {
+                        if ("slot" in item) {  // idk what are the items w/o slot
+                            if (item["id"] in inv_dict) {
+                                equip_dict[item["id"]] += 1;
+                            } else if (item["location"] != "EquippedFromLegendaryArmory") {
+                                equip_dict[item["id"]] = 1;
+                            }
+                        }
+                    })
+                }
+            );
+            // Iter inventory
+            let _q2 = api_request("characters/"+encodeURIComponent(chars[id])+"/inventory").then(
+                function(bags) {
+                    bags["bags"].map(function(bag) {
+                        for (let it of bag["inventory"]) {
+                            if (it) {  // Avoid empty slots
+                                if (it["id"] in inv_dict) {
+                                    inv_dict[it["id"]] += it["count"];
+                                } else  {
+                                    inv_dict[it["id"]] = it["count"];
+                                }
+                            }
+                        }
+                    })
+                }
+            );
+            queries.push(_q);
+            queries.push(_q2);
+        }
+        // TODO Bank
+        await Promise.all(queries).then(function () {
+            //Usually if you have items from the LA equiped, they will be in the LA with
+            //the total count. Also, usually you don't have items from the LA in the inventory
+            //So theorically, no need to check the item count
+            let comb_inv = {...equip_dict, ...la_dict, ...inv_dict};
+            // https://stackoverflow.com/a/13743332/9304067
+            localStorage.setItem("inventory", JSON.stringify(comb_inv))
+            // TODO update invetory indicator
+            $("#inventory-flag i").removeClass("fa-refresh fa-spin");
+            $("#inventory-flag i").addClass("fa-check");
+        });
+    });
+}
+
 async function updateUserInformation() {
     /* Update user account materials and bank references
     */
     await refreshMaterials();
+    await refreshInventory();
     // TODO bank references
     console.log("User information updated");
 }
@@ -172,13 +243,16 @@ function checkUnlocked(item_json, count) {
     */
     let type = item_json['type'];
     let item_id = item_json['id'];
+    // let body_item_list = ["Weapon", "Armor", "Trinket", "Ring"]
+    let materials = JSON.parse(localStorage.getItem("materials"));
+    let inventory = JSON.parse(localStorage.getItem("inventory"));
 
-    if (type == "CraftingMaterial") {
-        let materials = JSON.parse(localStorage.getItem("materials"));
-        console.log("enough mats", materials[item_id] >= count);
+    if (item_id in inventory) {
+        return inventory[item_id] >= count;
+    } else if (type == "CraftingMaterial") {
         return materials[item_id] >= count;
     } else {
-        console.log("Unsupport type");
+        // console.log("Unsupport type");
         return false;
     }
 
@@ -189,7 +263,7 @@ function drawItem(item_json) {
      * api key.
      * A bit transparent if not unlocked, no transparency if unlocked
     */
-    console.log(item_json);
+    // console.log(item_json);
     let _id = item_json['id'];
     let _url = item_json['icon'];
     let _name = item_json['name'];
@@ -366,6 +440,7 @@ $(document).ready(function() {
     // Add item row
     $("#item-input-id").on("click", function(){ this.select(); });
     $("#refresh-materials").on("click", refreshMaterials);
+    $("#refresh-inventory").on("click", refreshInventory);
     $("#addItem-addon").on("click", function() {addItem()});
     $("#item-input-id").on("keydown", function(e){
         console.log("keydown");
@@ -375,7 +450,7 @@ $(document).ready(function() {
 
     // Check if user has a session with valid token
     isUserLogged().then(function(userLogged){
-        console.log(userLogged);
+        // console.log(userLogged);
         if (!userLogged) {
             $('#loginModal').modal('show');
         } else {

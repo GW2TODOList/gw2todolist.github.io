@@ -29,7 +29,7 @@
         <div class="modal-body">
           Input API Key <input type="text" name="apikey" id="input_apikey" placeholder="Your API Key">
           <p class="mt-2 mb-0">
-            In development, for now I am using "progression, wallet, account, inventories, unlocks" permissions
+            In development, for now I am using "account, inventories, characters, unlocks and builds" permissions
           </p>
         </div>
         <div class="modal-footer">
@@ -85,7 +85,7 @@
       <!-- Alert section end -->
       <div class="container">
         <!-- Add item input bar section -->
-        <div class="row justify-content-between pt-4 pb-4">
+        <div class="row justify-content-between align-items-center pt-4 pb-4">
           <div id="add-item" class="col-6">
             <div class="input-group">
               <span class="input-group-text" id="item-addon">Item</span>
@@ -95,9 +95,13 @@
           </div>
           <div id="refresh-buttons" class="col-auto">
             <ul class="list-group border-none" style="border: none;">
-              <li class="border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
+              <li class="p-0 border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
                 <small id="refresh-materials" class="pointer">Update materials</small>
                 <span id="materials-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
+              </li>
+              <li class="p-0 border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
+                <small id="refresh-inventory" class="pointer">Update inventory</small>
+                <span id="inventory-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
               </li>
             </ul>
           </div>
