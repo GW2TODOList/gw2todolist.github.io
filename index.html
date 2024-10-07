@@ -21,6 +21,48 @@
   </head>
 
   <body>
+  <!-- Welcome Modal -->
+  <div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModal"
+      aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Welcome!</h5>
+        </div>
+        <div class="modal-body">
+            <p>This is a web-app to keep track of different items that you can craft
+            in Guild Wars 2. This way you don't need to bookmark multiple pages
+            from the wiki and also it tells you if you already fulfill some of the
+            required ingredients (forget about crafting multiple <a href="https://wiki.guildwars2.com/wiki/Gift_of_Dust" target="_blank">Gift of Dust</a>). You just need a chat link that you can
+            easily find in the wiki!</p>
+
+            <p>To achieve this automatic search you need to create an
+            <a href="https://account.arena.net/applications" target="_blank">API Token</a>
+            with the following permissions:</p>
+            <p class="text-center">Account, Inventories, Characters,
+            Unlocks and Builds.</p>
+
+            <p>This app doesn't store any information outside your web browser
+            (it's a completely static website) nor use cookies (Is 
+            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" target="_blank"> localStorage </a> a cookie?). If you don't trust me, you can check out the code
+            <a href="https://github.com/GW2TODOList/gw2todolist.github.io" target="_blank"> here</a>,
+            or download it and open the index.html by yourself.</p>
+
+            <p>Right now, only craftable items can be correctly tracked, but if possible
+            I plan to add more things like skins or items from achievements.</p>
+
+            <p>Stay tune!</p>
+            <p><i>PS: If you were already using this web, I recommend you to reset the API Key,
+                as I changed the required permissions</i></p>
+        </div>
+        <div class="modal-footer">
+          <button id="dismissWelcome" type="button" class="btn btn-secondary col-6 m-auto">Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Modal end -->
   <!-- Login Modal -->
   <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal"
       aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
