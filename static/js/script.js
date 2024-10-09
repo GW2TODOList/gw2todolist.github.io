@@ -83,7 +83,7 @@ async function refreshMaterials() {
     $("#materials-flag i").removeClass("fa-check");
     $("#materials-flag i").addClass("fa-refresh fa-spin");
     let mat_dict = {};
-    api_request("account/materials").then(
+    return api_request("account/materials").then(
         function(resp) {
             // Remap list of dicts into a dict by id
             resp.map((it) => (
@@ -117,7 +117,7 @@ async function refreshInventory() {
             ))
         }
     );
-    api_request("characters").then(async function(chars) {
+    return api_request("characters").then(async function(chars) {
         let queries = [];
         for (let id in chars) {
             // Iter characters to get their inventory and equipment
@@ -172,10 +172,13 @@ async function refreshInventory() {
 async function updateUserInformation() {
     /* Update user account materials and bank references
     */
-    await refreshMaterials();
-    await refreshInventory();
-    // TODO bank references
-    console.log("User information updated");
+    await Promise.all([
+        refreshMaterials(),
+        refreshInventory()
+    ]).then(function() {
+        // TODO bank references
+        console.log("User information updated");
+    });
 }
 
 /////////////////////////////////
@@ -243,19 +246,20 @@ function checkUnlocked(item_json, count) {
     */
     let type = item_json['type'];
     let item_id = item_json['id'];
-    // let body_item_list = ["Weapon", "Armor", "Trinket", "Ring"]
+
+    $("#alert-header").html("");
     let materials = JSON.parse(localStorage.getItem("materials"));
     let inventory = JSON.parse(localStorage.getItem("inventory"));
 
     if (item_id in inventory) {
-        return inventory[item_id] >= count;
-    } else if (type == "CraftingMaterial") {
-        return materials[item_id] >= count;
-    } else {
-        // console.log("Unsupport type");
-        return false;
+        if (inventory[item_id] >= count)
+            return true;
     }
-
+    if (type == "CraftingMaterial") {
+        if (materials[item_id] >= count)
+            return true;
+    }
+    return false;
 }
 
 function drawItem(item_json) {
@@ -387,15 +391,30 @@ function removeItem() {
 function getUserData() {
     /*
      * Returns all the user data stored in the storage
-     *
      **/
     let storage = window.localStorage;
     let items = JSON.parse(storage.getItem("items"));
-    if (items)  {
-        for (let item of items) {
-            drawItem(item);
-        }
+    let queries = [];
+
+    if (localStorage.getItem("materials") == undefined) {
+        // User does not have materials for some reason
+        _alertGenerator("Account materials are missing. Obtaining...", "info");
+        let q = refreshMaterials();
+        queries.push(q);
     }
+    if (localStorage.getItem("inventory") == undefined) {
+        _alertGenerator("Inventory items are missing. Obtaining...", "info");
+        let q = refreshInventory();
+        queries.push(q)
+    }
+
+    Promise.all(queries).then(function() {
+        if (items)  {
+            for (let item of items) {
+                drawItem(item);
+            }
+        }
+    });
 }
 
 
@@ -412,6 +431,21 @@ function resetToken() {
     $("#loginModal").modal("show");
 }
 ////////////////////
+
+function dismissWelcome() {
+    /* Welcome message will be shown to every user once
+    */
+    $("#welcomeModal").modal("toggle");
+    localStorage.setItem("welcomed", true);
+    isUserLogged().then(function(userLogged){
+        // console.log(userLogged);
+        if (localStorage.welcomed && !userLogged) {
+            $('#loginModal').modal('show');
+        } else {
+            getUserData();
+        }
+    });
+}
 
 
 function offsetNav() {
@@ -432,6 +466,7 @@ function scrollToIt(section) {
 
 
 $(document).ready(function() {
+    $("#welcomeModal button").on("click", dismissWelcome);
     $("#loginModal button").on("click", submitUserToken);
     // Header
     $("#resetToken").on("click", resetTokenModal);
@@ -451,7 +486,10 @@ $(document).ready(function() {
     // Check if user has a session with valid token
     isUserLogged().then(function(userLogged){
         // console.log(userLogged);
-        if (!userLogged) {
+        if (!localStorage.welcomed) {
+            $('#welcomeModal').modal('show');
+        }
+        else if (localStorage.welcomed && !userLogged) {
             $('#loginModal').modal('show');
         } else {
             getUserData();
