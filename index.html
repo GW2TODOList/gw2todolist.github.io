@@ -136,7 +136,7 @@
             </div>
           </div>
           <div id="refresh-buttons" class="col-auto">
-            <ul class="list-group border-none" style="border: none;">
+            <ul class="list-group list-group-horizontal border-none" style="border: none;">
               <li class="p-0 border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
                 <small id="refresh-materials" class="pointer">Update materials</small>
                 <span id="materials-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
@@ -144,6 +144,13 @@
               <li class="p-0 border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
                 <small id="refresh-inventory" class="pointer">Update inventory</small>
                 <span id="inventory-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
+              </li>
+            </ul>
+            <ul class="list-group list-group-horizontal border-none flex-row-reverse" style="border: none;">
+              <!-- TODO: remove flex row reverse if adding a 2nd li -->
+              <li class="p-0 border-none list-group-item d-flex justify-content-between align-items-center" style="border: none;">
+                <small id="refresh-bank" class="pointer">Update bank</small>
+                <span id="bank-flag" class="badge text-dark"><i class="fa fa-refresh"></i></span>
               </li>
             </ul>
           </div>

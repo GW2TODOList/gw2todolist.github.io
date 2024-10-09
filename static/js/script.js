@@ -154,7 +154,6 @@ async function refreshInventory() {
             queries.push(_q);
             queries.push(_q2);
         }
-        // TODO Bank
         await Promise.all(queries).then(function () {
             //Usually if you have items from the LA equiped, they will be in the LA with
             //the total count. Also, usually you don't have items from the LA in the inventory
@@ -169,14 +168,34 @@ async function refreshInventory() {
     });
 }
 
+async function refreshBank() {
+    $("#bank-flag i").removeClass("fa-check");
+    $("#bank-flag i").addClass("fa-refresh fa-spin");
+    let bank_dict = {};
+    return api_request("account/bank").then(function(items) {
+        items.map(function(item) {
+            if (item) {  // empty slots
+                if (item["id"] in bank_dict) {
+                    bank_dict[item["id"]] += item['count'];
+                } else {
+                    bank_dict[item["id"]] = item['count'];
+                }
+            }
+        });
+        localStorage.setItem("bank", JSON.stringify(bank_dict))
+        $("#bank-flag i").removeClass("fa-refresh fa-spin");
+        $("#bank-flag i").addClass("fa-check");
+    });
+}
+
 async function updateUserInformation() {
     /* Update user account materials and bank references
     */
     await Promise.all([
         refreshMaterials(),
-        refreshInventory()
+        refreshInventory(),
+        refreshBank()
     ]).then(function() {
-        // TODO bank references
         console.log("User information updated");
     });
 }
@@ -250,16 +269,17 @@ function checkUnlocked(item_json, count) {
     $("#alert-header").html("");
     let materials = JSON.parse(localStorage.getItem("materials"));
     let inventory = JSON.parse(localStorage.getItem("inventory"));
+    let bank = JSON.parse(localStorage.getItem("bank"));
 
-    if (item_id in inventory) {
-        if (inventory[item_id] >= count)
-            return true;
-    }
-    if (type == "CraftingMaterial") {
-        if (materials[item_id] >= count)
-            return true;
-    }
-    return false;
+    let account_items = 0;
+    if (item_id in inventory)
+        account_items += inventory[item_id];
+    if (type == "CraftingMaterial")
+        account_items += materials[item_id];
+    if (item_id in bank)
+        account_items += bank[item_id];
+
+    return account_items >= count;
 }
 
 function drawItem(item_json) {
@@ -407,6 +427,11 @@ function getUserData() {
         let q = refreshInventory();
         queries.push(q)
     }
+    if (localStorage.getItem("bank") == undefined) {
+        _alertGenerator("Bank items are missing. Obtaining...", "info");
+        let q = refreshBank();
+        queries.push(q)
+    }
 
     Promise.all(queries).then(function() {
         if (items)  {
@@ -422,6 +447,7 @@ function getUserData() {
 function resetTokenModal() {
     $("#tokenModal").modal("show");
 }
+
 function resetToken() {
     /* User wants to change token
     */
@@ -476,6 +502,7 @@ $(document).ready(function() {
     $("#item-input-id").on("click", function(){ this.select(); });
     $("#refresh-materials").on("click", refreshMaterials);
     $("#refresh-inventory").on("click", refreshInventory);
+    $("#refresh-bank").on("click", refreshBank);
     $("#addItem-addon").on("click", function() {addItem()});
     $("#item-input-id").on("keydown", function(e){
         console.log("keydown");
