@@ -83,7 +83,7 @@ async function refreshMaterials() {
     $("#materials-flag i").removeClass("fa-check");
     $("#materials-flag i").addClass("fa-refresh fa-spin");
     let mat_dict = {};
-    api_request("account/materials").then(
+    return api_request("account/materials").then(
         function(resp) {
             // Remap list of dicts into a dict by id
             resp.map((it) => (
@@ -117,7 +117,7 @@ async function refreshInventory() {
             ))
         }
     );
-    api_request("characters").then(async function(chars) {
+    return api_request("characters").then(async function(chars) {
         let queries = [];
         for (let id in chars) {
             // Iter characters to get their inventory and equipment
@@ -175,9 +175,10 @@ async function updateUserInformation() {
     await Promise.all([
         refreshMaterials(),
         refreshInventory()
-    ]);
-    // TODO bank references
-    console.log("User information updated");
+    ]).then(function() {
+        // TODO bank references
+        console.log("User information updated");
+    });
 }
 
 /////////////////////////////////
@@ -245,19 +246,20 @@ function checkUnlocked(item_json, count) {
     */
     let type = item_json['type'];
     let item_id = item_json['id'];
-    // let body_item_list = ["Weapon", "Armor", "Trinket", "Ring"]
+
+    $("#alert-header").html("");
     let materials = JSON.parse(localStorage.getItem("materials"));
     let inventory = JSON.parse(localStorage.getItem("inventory"));
 
     if (item_id in inventory) {
-        return inventory[item_id] >= count;
-    } else if (type == "CraftingMaterial") {
-        return materials[item_id] >= count;
-    } else {
-        // console.log("Unsupport type");
-        return false;
+        if (inventory[item_id] >= count)
+            return true;
     }
-
+    if (type == "CraftingMaterial") {
+        if (materials[item_id] >= count)
+            return true;
+    }
+    return false;
 }
 
 function drawItem(item_json) {
@@ -386,22 +388,26 @@ function removeItem() {
     localStorage.setItem("items", JSON.stringify(items));
 }
 
-async function getUserData() {
+function getUserData() {
     /*
      * Returns all the user data stored in the storage
      **/
     let storage = window.localStorage;
     let items = JSON.parse(storage.getItem("items"));
-    let queries = []
-    if (storage.getItem("materials") == undefined) {
+    let queries = [];
+
+    if (localStorage.getItem("materials") == undefined) {
         // User does not have materials for some reason
         _alertGenerator("Account materials are missing. Obtaining...", "info");
-        queries.push(refreshMaterials());
+        let q = refreshMaterials();
+        queries.push(q);
     }
-    if (storage.getItem("inventory") == undefined) {
+    if (localStorage.getItem("inventory") == undefined) {
         _alertGenerator("Inventory items are missing. Obtaining...", "info");
-        queries.push(refreshInventory());
+        let q = refreshInventory();
+        queries.push(q)
     }
+
     Promise.all(queries).then(function() {
         if (items)  {
             for (let item of items) {
