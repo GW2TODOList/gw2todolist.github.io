@@ -1,3 +1,74 @@
+/* NO COLORS IN COMMON.CSS PLEASE */
+/* From wiki https://wiki.guildwars2.com/wiki/Guild_Wars_2_Wiki:Projects/CSS_documentation/fonts-_common
+ * commented in case I need them later
+@font-face {
+    font-family: "EasonPro";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-regular-webfont.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-regular-webfont.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-regular-webfont.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-regular-webfont.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-regular-webfont.svg#EasonProregular") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "EasonPro";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-italic-webfont.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-italic-webfont.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-italic-webfont.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-italic-webfont.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-italic-webfont.svg#EasonProitalic") format("svg");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "EasonPro";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-bold-webfont.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-bold-webfont.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-bold-webfont.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-bold-webfont.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/eason/v1/easonpro-bold-webfont.svg#EasonProBold") format("svg");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Menomonia";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia.svg#MenomoniaRegular") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Menomonia";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia-italic.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia-italic.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia-italic.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia-italic.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/font/menomonia-italic.svg#MenomoniaRegular") format("svg");
+    font-weight: normal;
+    font-style: italic;
+}
+*/
+
+@font-face {
+    font-family: "CronosPro";
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/cronos/v1/cronospro-regular-webfont.eot");
+    src: url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/cronos/v1/cronospro-regular-webfont.eot?#iefix") format("embedded-opentype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/cronos/v1/cronospro-regular-webfont.woff") format("woff"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/cronos/v1/cronospro-regular-webfont.ttf") format("truetype"),
+        url("https://d1h9a8s8eodvjz.cloudfront.net/fonts/cronos/v1/cronospro-regular-webfont.svg#CronosProregular") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 :root {
     /* Copied from the wiki */
     --junk: #AAAAAA;
@@ -14,6 +85,7 @@ html {
   width: 100% !important;
 }
 * {
+  font-family: CronosPro;
   box-sizing: border-box;
   text-align: justify;
 }
