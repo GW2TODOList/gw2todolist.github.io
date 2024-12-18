@@ -188,6 +188,13 @@ async function refreshBank() {
     });
 }
 
+async function findMysticForge(item_id) {
+    // Json is downloaded from https://gw2profits.com/json/v2/forge
+    /* If an item does not have crafting recipe search for it in the
+     * mystic forge json */
+    return;
+}
+
 async function updateUserInformation() {
     /* Update user account materials and bank references
     */
@@ -473,6 +480,31 @@ function dismissWelcome() {
     });
 }
 
+function exportData() {
+    /* Return as json the localStorage */
+    // https://stackoverflow.com/a/76334547/9304067
+    let data = JSON.stringify(window.localStorage);
+    const blob = new Blob([data]);
+    const link = document.createElement("a");
+    link.download = "gw2-todolist-data.json";
+    link.href = window.URL.createObjectURL(blob);
+    link.click();
+}
+
+function _processJsonData() {
+    /* Process json data uploaded by used*/
+    console.log("hola");
+    let file = document.getElementById("loadjson").files[0];
+    let fr = new FileReader();
+    fr.addEventListener("load", function(e) {
+        let jsondata = JSON.parse(fr.result);
+        for (k in jsondata) {
+            window.localStorage.setItem(k, jsondata[k]);
+        }
+    });
+    fr.readAsText(file);
+}
+
 
 function offsetNav() {
     var navbar = document.getElementById("navbar");
@@ -495,8 +527,12 @@ $(document).ready(function() {
     $("#welcomeModal button").on("click", dismissWelcome);
     $("#loginModal button").on("click", submitUserToken);
     // Header
+    $("#exportData").on("click", exportData);
+    $("#loadData").on("click", function() {$("input#loadjson").trigger("click")});
     $("#resetToken").on("click", resetTokenModal);
     $("#confirmResetToken").on("click", resetToken);
+
+    $("input#loadjson").on("change", _processJsonData);
     /////
     // Add item row
     $("#item-input-id").on("click", function(){ this.select(); });

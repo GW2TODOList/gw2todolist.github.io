@@ -16,10 +16,8 @@ is stored outside your PC
 
 ## TODO list
 
-- Export / Load button to download a json with all the info, so you can take it to other PCs
 - Add bulk: To add multiple chat links at once
 - Progress bar on the different items?
 - Possibility to reorder items in the list?
-- Nice CSS (PR are welcome :grin:)
 - How do I get Mystic forge recipes ??
 - Check skins - Can I access the wardrobe?
