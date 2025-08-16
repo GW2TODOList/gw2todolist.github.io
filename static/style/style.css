@@ -84,14 +84,17 @@
 html {
   width: 100% !important;
 }
+
 * {
   font-family: CronosPro;
   box-sizing: border-box;
   text-align: justify;
 }
+
 #body {
   position: relative;
 }
+
 body section {
   font-size: 1.15rem;
 }
@@ -170,6 +173,34 @@ body section {
     }
 }
 
+header {
+    background-color: #0B1215;
+    .nav-link {
+        color: #F8F8FF;
+    }
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    background: #0B1215;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 30px;
+    width: 100%;
+
+    p {
+        color: #F8F8FF;
+        margin: 0 10px;
+        a {
+            color: #F8F8FF;
+        }
+        i {
+            font-size: 2rem !important;
+        }
+    }
+}
 
 
 /* ======  MEDIA QUERY SECTION START ====== */

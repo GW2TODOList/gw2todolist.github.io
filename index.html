@@ -61,8 +61,8 @@
       </div>
     </div>
   </div>
-
   <!-- Welcome Modal end -->
+
   <!-- Login Modal -->
   <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal"
       aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -81,6 +81,7 @@
     </div>
   </div>
   <!-- Login Modal end -->
+
   <!-- Refresh token modal -->
   <div class="modal fade" id="tokenModal" tabindex="-1" role="dialog" aria-labelledby="tokenModal"
       aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
@@ -96,8 +97,28 @@
       </div>
     </div>
   </div>
-
   <!-- Refresh token end -->
+
+  <!-- Add bulk modal -->
+  <div class="modal fade" id="addBulkModal" tabindex="-1" role="dialog" aria-labelledby="addBulkModal"
+      aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+            <div class="form-floating">
+              <textarea id="bulkTextArea" class="form-control" placeholder="Add 1 item code per line"></textarea>
+              <label for="bulkTextArea">Add 1 item code per line</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="addBulkConfirm" type="button" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Add bulk modal end -->
+
   <header>
     <nav class="navbar navbar-dark bg-dark sticky-top">
       <div class="container">
@@ -114,7 +135,7 @@
             <input type="file" id="loadjson" style="display:none" accept=".json" name="jsondata">
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#">Add bulk</a>
+            <a data-bs-toggle="modal" data-bs-target="#addBulkModal" class="nav-link" href="#">Add bulk</a>
           </li>
           <li class="nav-item">
             <a id="resetToken" class="nav-link" href="#">Reset API key</a>
@@ -169,6 +190,8 @@
 
   </section>
   <footer>
+      <p class="pointer" id="showAbout" data-bs-toggle="modal" data-bs-target="#welcomeModal"> about </p>
+      <p> <a href="https://github.com/GW2TODOList/gw2todolist.github.io" target="_blank"> <i class="fa fa-github" aria-hidden="true"></i> </a> </p>
       <!-- github link -->
       <!-- created by -->
   </footer>

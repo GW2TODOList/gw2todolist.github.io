@@ -375,7 +375,6 @@ function addItem(chat_link=undefined) {
     /* Read item chat link from the input text, add it to localStorage
      * and paint it in the todo-list
      */
-    console.log(chat_link);
     let storage = window.localStorage;
     let registered_items = JSON.parse(storage.getItem("items"));
     let input_val = undefined;
@@ -398,6 +397,8 @@ function addItem(chat_link=undefined) {
             // Search and store related recipes
             getItemRecipe(resp['id']).then(function(recipes){
                 resp['recipes'] = recipes;
+                // updates bc might have changed with bulk indexing
+                registered_items = JSON.parse(storage.getItem("items"));
                 registered_items.push(resp);
                 storage.setItem("items", JSON.stringify(registered_items));
 
@@ -474,8 +475,6 @@ function dismissWelcome() {
         // console.log(userLogged);
         if (localStorage.welcomed && !userLogged) {
             $('#loginModal').modal('show');
-        } else {
-            getUserData();
         }
     });
 }
@@ -493,7 +492,6 @@ function exportData() {
 
 function _processJsonData() {
     /* Process json data uploaded by used*/
-    console.log("hola");
     let file = document.getElementById("loadjson").files[0];
     let fr = new FileReader();
     fr.addEventListener("load", function(e) {
@@ -503,6 +501,18 @@ function _processJsonData() {
         }
     });
     fr.readAsText(file);
+    location.reload();
+}
+
+function _addBulkData() {
+    /* Read and clear text area */
+    let item_codes = $("#bulkTextArea").val();
+    $("#bulkTextArea").val("");
+    item_codes = item_codes.split("\n");
+    for (let code of item_codes) {
+        addItem(code);
+    }
+    $("#addBulkModal").modal("toggle");
 }
 
 
@@ -533,6 +543,8 @@ $(document).ready(function() {
     $("#confirmResetToken").on("click", resetToken);
 
     $("input#loadjson").on("change", _processJsonData);
+    $("#addBulkConfirm").on("click", _addBulkData);
+
     /////
     // Add item row
     $("#item-input-id").on("click", function(){ this.select(); });
@@ -548,7 +560,6 @@ $(document).ready(function() {
 
     // Check if user has a session with valid token
     isUserLogged().then(function(userLogged){
-        // console.log(userLogged);
         if (!localStorage.welcomed) {
             $('#welcomeModal').modal('show');
         }
