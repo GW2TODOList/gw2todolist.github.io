@@ -16,7 +16,6 @@ is stored outside your PC
 
 ## TODO list
 
-- Add bulk: To add multiple chat links at once
 - Progress bar on the different items?
 - Possibility to reorder items in the list?
 - How do I get Mystic forge recipes ??
