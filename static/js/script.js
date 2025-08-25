@@ -60,19 +60,21 @@ async function getItemRecipe(item_id) {
     let lang = storage.getItem("lang") || "en";
 
     let recipes = await api_request("recipes/search", "&output="+item_id);
-    let alternatives = [];
+    let alternatives = {};
     if (recipes.length > 0) {
-        let ingredients = [];
-        // For each possible recipe, store related items
         for (let recp_id of recipes) {
+            let ingredients = [];
+            // For each possible recipe, store related items
             let recp = await api_request("recipes/"+recp_id);
             for (let ingr of recp['ingredients']) {
                 let recp_ingr = await api_request("items/"+ingr['id'], "&lang="+lang);
                 recp_ingr['count'] = ingr['count'];  // Add this info
                 ingredients.push(recp_ingr);
             }
+            for (let disp of recp['disciplines']) {
+                alternatives[disp] = ingredients;
+            }
         }
-        alternatives.push(ingredients);
     }
     return alternatives;
 }
@@ -303,10 +305,31 @@ function drawItem(item_json) {
     let todo_unlocked = checkUnlocked(item_json, 1);
 
     // Generate ingredients html
-    let recipes_html = "<div>";
-    for (let recipe of _recipes) {
-        recipes_html += "<div class='d-flex align-content-center'>";
-        for (let ingr of recipe) {
+    let recipes_html = "<div id='recipes"+_id+"'>";
+    if (Array.isArray(_recipes)) {
+        _recipes = {"default": _recipes[0] || []};
+    }
+
+    let first = true;
+    if (!("default" in _recipes)) {
+        recipes_html += "<div class='disciplineIcons'>";
+        for (let discipline in _recipes) {
+                recipes_html += `<img id="`+discipline+_id+`Icon" class="pointer discipline-icon collapsed" src="static/images/`+discipline+`.png"
+            alt="`+discipline+`" aria-expanded="`+((first) ? "true" : "false")+`" data-bs-toggle="collapse" data-bs-target="#`+discipline+_id+`"
+            aria-controls="`+discipline+_id+`">`;
+            first = false;
+        }
+        recipes_html += "</div>";
+    }
+    first = true;
+    for (let discipline in _recipes) {
+        recipes_html += `<div id="`+discipline+_id+`" class='accordion-collapse collapse `+ ((first) ? "show" : "") +`'
+            aria-labelledby="`+discipline+_id+`Icon" data-bs-parent="#recipes`+_id+`">`;
+        first = false;
+
+        recipes_html += '<div class="accordion-body d-flex align-content-center align-items-center mt-2">';
+
+        for (let ingr of _recipes[discipline]) {
             let extra_classes = "";
             let unlocked = checkUnlocked(ingr, ingr['count']);
             if (!unlocked) {
@@ -323,7 +346,7 @@ function drawItem(item_json) {
                 title="`+tooltip_title+`">
             </div>`;
         }
-        recipes_html += "</div>";
+        recipes_html += "</div></div>";
     }
     recipes_html += "</div>";
 
@@ -553,7 +576,6 @@ $(document).ready(function() {
     $("#refresh-bank").on("click", refreshBank);
     $("#addItem-addon").on("click", function() {addItem()});
     $("#item-input-id").on("keydown", function(e){
-        console.log("keydown");
         if (e.keyCode == 13) { console.log("enter"); addItem(); }
     });
     //////

@@ -162,6 +162,9 @@ body section {
         position: relative;
         max-height: 48px;  /* icons are 64x64px*/
         max-width: 48px;
+        img {
+            max-width: 100%;
+        }
         .item-count {
             right: 0;
             color: white;
@@ -169,6 +172,14 @@ body section {
             position: absolute;
             bottom: 0;
             margin: 0;
+        }
+    }
+
+    .discipline-icon {
+        max-width: 24px;
+
+        &[aria-expanded="false"] {
+            opacity: 50%;
         }
     }
 }
@@ -181,8 +192,6 @@ header {
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
     background: #0B1215;
     display: flex;
     justify-content: center;
